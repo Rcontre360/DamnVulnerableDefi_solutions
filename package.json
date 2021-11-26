@@ -7,18 +7,18 @@
     "url": "https://github.com/tinchoabbate/damn-vulnerable-defi.git"
   },
   "scripts": {
-    "unstoppable": "yarn hardhat test test/unstoppable/unstoppable.challenge.js",
-    "truster": "yarn hardhat test test/truster/truster.challenge.js",
-    "naive-receiver": "yarn hardhat test test/naive-receiver/naive-receiver.challenge.js",
-    "side-entrance": "yarn hardhat test test/side-entrance/side-entrance.challenge.js",
-    "the-rewarder": "yarn hardhat test test/the-rewarder/the-rewarder.challenge.js",
-    "selfie": "yarn hardhat test test/selfie/selfie.challenge.js",
-    "compromised": "yarn hardhat test test/compromised/compromised.challenge.js",
-    "puppet": "yarn hardhat test test/puppet/puppet.challenge.js",
-    "puppet-v2": "yarn hardhat test test/puppet-v2/puppet-v2.challenge.js",
-    "free-rider": "yarn hardhat test test/free-rider/free-rider.challenge.js",
-    "backdoor": "yarn hardhat test test/backdoor/backdoor.challenge.js",
-    "climber": "yarn hardhat test test/climber/climber.challenge.js"
+    "unstoppable": "hardhat test test/unstoppable/unstoppable.challenge.js",
+    "truster": "hardhat test test/truster/truster.challenge.js",
+    "naive-receiver": "hardhat test test/naive-receiver/naive-receiver.challenge.js",
+    "side-entrance": "hardhat test test/side-entrance/side-entrance.challenge.js",
+    "the-rewarder": "hardhat test test/the-rewarder/the-rewarder.challenge.js",
+    "selfie": "hardhat test test/selfie/selfie.challenge.js",
+    "compromised": "hardhat test test/compromised/compromised.challenge.js",
+    "puppet": "hardhat test test/puppet/puppet.challenge.js",
+    "puppet-v2": "hardhat test test/puppet-v2/puppet-v2.challenge.js",
+    "free-rider": "hardhat test test/free-rider/free-rider.challenge.js",
+    "backdoor": "hardhat test test/backdoor/backdoor.challenge.js",
+    "climber": "hardhat test test/climber/climber.challenge.js"
   },
   "devDependencies": {
     "@gnosis.pm/safe-contracts": "1.3.0",
