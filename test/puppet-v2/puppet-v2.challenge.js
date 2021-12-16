@@ -2,8 +2,8 @@ const pairJson = require("@uniswap/v2-core/build/UniswapV2Pair.json");
 const factoryJson = require("@uniswap/v2-core/build/UniswapV2Factory.json");
 const routerJson = require("@uniswap/v2-periphery/build/UniswapV2Router02.json");
 
-const { ethers } = require('hardhat');
-const { expect } = require('chai');
+const {ethers} = require('hardhat');
+const {expect} = require('chai');
 
 describe('[Challenge] Puppet v2', function () {
     let deployer, attacker;
@@ -16,7 +16,7 @@ describe('[Challenge] Puppet v2', function () {
     const POOL_INITIAL_TOKEN_BALANCE = ethers.utils.parseEther('1000000');
 
     before(async function () {
-        /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */  
+        /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */
         [deployer, attacker] = await ethers.getSigners();
 
         await ethers.provider.send("hardhat_setBalance", [
@@ -28,7 +28,7 @@ describe('[Challenge] Puppet v2', function () {
         const UniswapFactoryFactory = new ethers.ContractFactory(factoryJson.abi, factoryJson.bytecode, deployer);
         const UniswapRouterFactory = new ethers.ContractFactory(routerJson.abi, routerJson.bytecode, deployer);
         const UniswapPairFactory = new ethers.ContractFactory(pairJson.abi, pairJson.bytecode, deployer);
-    
+
         // Deploy tokens to be traded
         this.token = await (await ethers.getContractFactory('DamnValuableToken', deployer)).deploy();
         this.weth = await (await ethers.getContractFactory('WETH9', deployer)).deploy();
@@ -38,7 +38,7 @@ describe('[Challenge] Puppet v2', function () {
         this.uniswapRouter = await UniswapRouterFactory.deploy(
             this.uniswapFactory.address,
             this.weth.address
-        );        
+        );
 
         // Create Uniswap pair against WETH and add liquidity
         await this.token.approve(
@@ -52,7 +52,7 @@ describe('[Challenge] Puppet v2', function () {
             0,                                                          // amountETHMin
             deployer.address,                                           // to
             (await ethers.provider.getBlock('latest')).timestamp * 2,   // deadline
-            { value: UNISWAP_INITIAL_WETH_RESERVE }
+            {value: UNISWAP_INITIAL_WETH_RESERVE}
         );
         this.uniswapExchange = await UniswapPairFactory.attach(
             await this.uniswapFactory.getPair(this.token.address, this.weth.address)
@@ -82,6 +82,16 @@ describe('[Challenge] Puppet v2', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        [deployer, attacker] = await ethers.getSigners();
+        const balanceEth = await ethers.provider.getBalance(attacker.address);
+        await this.weth.deposit({value: balanceEth.toString(), from: attacker.address});
+        console.log({balance: (await this.weth.balanceOf(attacker.address)).toString()})
+        //await this.weth.approve(this.lendingPool.address, ethers.utils.parseEther('20'))
+        //console.log((await this.weth.balanceOf(attacker.address)).toString())
+        //await this.lendingPool.borrow(
+        //4
+        //)
+        //console.log(ethers.balanceOf)
     });
 
     after(async function () {
