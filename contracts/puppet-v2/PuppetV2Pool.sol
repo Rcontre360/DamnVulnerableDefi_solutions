@@ -60,7 +60,6 @@ contract PuppetV2Pool {
 
         // Calculate how much WETH the user must deposit
         uint256 depositOfWETHRequired = calculateDepositOfWETHRequired(borrowAmount);
-        console.log(depositOfWETHRequired);
 
         // Take the WETH
         _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired);
