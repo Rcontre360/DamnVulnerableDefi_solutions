@@ -64,10 +64,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         uint256
     ) external override {
         // Make sure we have enough DVT to pay
-        require(
-            token.balanceOf(address(this)) >= TOKEN_PAYMENT,
-            "Not enough funds to pay"
-        );
+        require(token.balanceOf(address(this)) >= TOKEN_PAYMENT, "Not enough funds to pay");
 
         address payable walletAddress = payable(proxy);
 
@@ -76,8 +73,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         require(singleton == masterCopy, "Fake mastercopy used");
 
         // Ensure initial calldata was a call to `GnosisSafe::setup`
-        // DONE BY RALHP must change
-        //require(bytes4(initializer[:4]) == GnosisSafe.setup.selector, "Wrong initialization");
+        require(bytes4(initializer[:4]) == GnosisSafe.setup.selector, "Wrong initialization");
 
         // Ensure wallet initialization is the expected
         require(
@@ -92,10 +88,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         // Ensure the owner is a registered beneficiary
         address walletOwner = GnosisSafe(walletAddress).getOwners()[0];
 
-        require(
-            beneficiaries[walletOwner],
-            "Owner is not registered as beneficiary"
-        );
+        require(beneficiaries[walletOwner], "Owner is not registered as beneficiary");
 
         // Remove owner as beneficiary
         _removeBeneficiary(walletOwner);
