@@ -1,47 +1,51 @@
-const {ethers} = require('hardhat');
-const {expect} = require('chai');
+const {ethers} = require("hardhat");
+const {expect} = require("chai");
 
-describe('[Challenge] Backdoor', function () {
+describe("[Challenge] Backdoor", function () {
     let deployer, users, attacker;
 
-    const AMOUNT_TOKENS_DISTRIBUTED = ethers.utils.parseEther('40');
+    const AMOUNT_TOKENS_DISTRIBUTED = ethers.utils.parseEther("40");
 
     before(async function () {
         /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */
         [deployer, alice, bob, charlie, david, attacker] = await ethers.getSigners();
-        users = [alice.address, bob.address, charlie.address, david.address]
+        users = [alice.address, bob.address, charlie.address, david.address];
 
         // Deploy Gnosis Safe master copy and factory contracts
-        this.masterCopy = await (await ethers.getContractFactory('GnosisSafe', deployer)).deploy();
-        this.walletFactory = await (await ethers.getContractFactory('GnosisSafeProxyFactory', deployer)).deploy();
-        this.token = await (await ethers.getContractFactory('DamnValuableToken', deployer)).deploy();
+        this.masterCopy = await (await ethers.getContractFactory("GnosisSafe", deployer)).deploy();
+        this.walletFactory = await (
+            await ethers.getContractFactory("GnosisSafeProxyFactory", deployer)
+        ).deploy();
+        this.token = await (
+            await ethers.getContractFactory("DamnValuableToken", deployer)
+        ).deploy();
 
         // Deploy the registry
-        this.walletRegistry = await (await ethers.getContractFactory('WalletRegistry', deployer)).deploy(
-            this.masterCopy.address,
-            this.walletFactory.address,
-            this.token.address,
-            users
-        );
+        this.walletRegistry = await (
+            await ethers.getContractFactory("WalletRegistry", deployer)
+        ).deploy(this.masterCopy.address, this.walletFactory.address, this.token.address, users);
 
         // Users are registered as beneficiaries
         for (let i = 0; i < users.length; i++) {
-            expect(
-                await this.walletRegistry.beneficiaries(users[i])
-            ).to.be.true;
+            expect(await this.walletRegistry.beneficiaries(users[i])).to.be.true;
         }
 
         // Transfer tokens to be distributed to the registry
         await this.token.transfer(this.walletRegistry.address, AMOUNT_TOKENS_DISTRIBUTED);
     });
 
-    it('Exploit', async function () {
+    it("Exploit", async function () {
         /** CODE YOUR EXPLOIT HERE */
-        const singleton = await this.walletRegistry.masterCopy()
-        const Factory = await ethers.getContractFactory('BacdoorExploit');
-        const exploit = await Factory.deploy()
-        //await exploit.connect(attacker).start(this.walletFactory.address, singleton, this.walletRegistry.address);
-        await exploit.connect(attacker).test();
+        const Factory = await ethers.getContractFactory("BacdoorExploit");
+        const exploit = await Factory.deploy(
+            this.walletFactory.address,
+            this.walletRegistry.address,
+            this.token.address,
+            this.masterCopy.address,
+            attacker.address
+        );
+
+        await exploit.connect(attacker).start(users);
     });
 
     after(async function () {
@@ -50,17 +54,16 @@ describe('[Challenge] Backdoor', function () {
             let wallet = await this.walletRegistry.wallets(users[i]);
 
             // User must have registered a wallet
-            expect(wallet).to.not.eq(ethers.constants.AddressZero, "User did not register a wallet");
+            expect(wallet).to.not.eq(
+                ethers.constants.AddressZero,
+                "User did not register a wallet"
+            );
 
             // User is no longer registered as a beneficiary
-            expect(
-                await this.walletRegistry.beneficiaries(users[i])
-            ).to.be.false;
+            expect(await this.walletRegistry.beneficiaries(users[i])).to.be.false;
         }
 
         // Attacker must have taken all tokens
-        expect(
-            await this.token.balanceOf(attacker.address)
-        ).to.eq(AMOUNT_TOKENS_DISTRIBUTED);
+        expect(await this.token.balanceOf(attacker.address)).to.eq(AMOUNT_TOKENS_DISTRIBUTED);
     });
 });

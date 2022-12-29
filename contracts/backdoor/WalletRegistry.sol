@@ -76,10 +76,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         require(bytes4(initializer[:4]) == GnosisSafe.setup.selector, "Wrong initialization");
 
         // Ensure wallet initialization is the expected
-        require(
-            GnosisSafe(walletAddress).getThreshold() == MAX_THRESHOLD,
-            "Invalid threshold"
-        );
+        require(GnosisSafe(walletAddress).getThreshold() == MAX_THRESHOLD, "Invalid threshold");
         require(
             GnosisSafe(walletAddress).getOwners().length == MAX_OWNERS,
             "Invalid number of owners"
